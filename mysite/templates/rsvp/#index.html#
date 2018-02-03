@@ -1,0 +1,9 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% if User.is_authenticated %}
+
+
+
+{% endblock %}

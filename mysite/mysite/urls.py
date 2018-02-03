@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    path('auth/', include('account.urls')),
     path('rsvp/', include('rsvp.urls')),
     path('admin/', admin.site.urls),
 ]
@@ -24,4 +25,8 @@ urlpatterns = [
 from django.views.generic import RedirectView
 urlpatterns += [
     path('', RedirectView.as_view(url='/rsvp/')),
+]
+
+urlpatterns += [
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
