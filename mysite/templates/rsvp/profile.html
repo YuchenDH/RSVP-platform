@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+{% if user.is_authenticated %}
+<p> Your current events are: </p>
+<ul>
+  {% for item in EventsList %}
+  <li> <a href="{% url 'event' %}?{{ item.id }}"> {{ item.title }} </a> </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p> Please <a href="{% url 'login' %}?next={{ next }}"> login </a>  </p>
+{% endif %}
+
+<p> <a href="{% url 'create_event' %}"> New Event </a> </p>
+
+{% endblock %}
