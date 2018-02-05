@@ -7,7 +7,8 @@
 <p> Your current events are: </p>
 <ul>
   {% for item in EventsList %}
-  <li> <a href="{% url 'event' %}?{{ item.id }}"> {{ item.title }} </a> </li>
+ <!-- {$ if item.date_and_time < %} -->
+  <li> <a href="/event/{{ item.id }}"> {{ item.title }} </a>, on {{ item.date_and_time }}. </li>
   {% endfor %}
 </ul>
 {% else %}

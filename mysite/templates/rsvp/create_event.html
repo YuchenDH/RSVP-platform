@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% if form.errors %}
+<p> Invalid info </p>
+{% for item in form.errors %}
+<li> {{ item }} </li>
+{% endfor %}
+{% endif %}
+
+<form method="post" action="{% url 'create_event' %}">
+  {% csrf_token %}
+  <table>
+    {{ form }}
+  </table>
+  <input type="submit" value="Submit" />
+  <input type="reset">
+</form>
+
+<p> <a href="{% url 'index' %}"> Back to profile </a> </p>
+
+{% endblock %}

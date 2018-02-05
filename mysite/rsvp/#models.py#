@@ -28,7 +28,7 @@ class Event(models.Model):
     Model representing an event
     """
     title = models.CharField(max_length=200, help_text="Enter the title of the event")
-    owner = models.ManyToManyField(User)
+    owner = models.ManyToManyField(User,related_name='user_events')
     date_and_time = models.DateTimeField(help_text="Enter the date and time of the event")
     summary = models.TextField(help_text="(Optional) Enter the details of the event.", null=True, blank=True)
     plus = models.IntegerField(default=0, help_text="Can guests bring additonal guests?")

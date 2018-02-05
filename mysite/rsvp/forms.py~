@@ -1,0 +1,37 @@
+from django import forms
+from django.contrib.auth.models import User
+from bootstrap_toolkit.widgets import BootstrapDateInput, BootstrapTextInput, BootstrapUneditableInput
+
+class CreateEventForm(forms.Form):
+    title = forms.CharField(
+        required = True,
+        label = u"Event Title",
+        error_messages = {'required': 'Please input your event title'},
+        widget = forms.TextInput(
+            attrs={
+                'placeholder':u'Event Title',
+            }
+        ),
+    )
+    owner = User
+    summary = forms.CharField(
+        required = False,
+        label = u"Event Summary",
+        widget = forms.TextInput(
+            attrs={
+                'placeholder':u'Event Summary',
+            }
+        ),
+    )
+    plus = forms.IntegerField(
+        required = True,
+        label = u'How many extra person can each guest bring?',
+        initial = '0',
+        widget = forms.TextInput(),
+    )
+    
+    date_and_time = forms.DateTimeField(
+        required = True,
+        label = u'Time of the Event',
+        error_messages = {'required': 'Please specify the time of the event.'},
+    )

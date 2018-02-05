@@ -7,16 +7,22 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from . import models
-
+from . import forms
 @login_required
 def index(request):
     #return HttpResponse('profile')
-    EventList = User
-    return render(request, 'rsvp/profile.html')
-
+    EventsList = request.user.event_set.all()
+    return render(request, 'rsvp/profile.html', {'EventsList':EventsList})
 @login_required
 def create_event(request):
-    return HttpResponse('create_event')
+    if request.method == 'POST':
+        form = forms.CreateEventForm(request.POST)
+        if form.is_valid():
+            NewEvent = form.save()
+            return redirect('event', id=NewEvent.pk)
+    else:
+            form = forms.CreateEventForm()
+    return render(request, 'rsvp/create_event.html', {'form': form})
 
 def signup(request):
     if request.method == 'POST':
