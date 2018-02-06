@@ -62,6 +62,7 @@ class Guest(models.Model):
     """
     people = models.ManyToManyField(User, blank=True, null=True)
     event = models.OneToOneField(Event, on_delete=models.CASCADE)
+    response = models.BooleanField(default=0)
 
 class Question(models.Model):
     """
