@@ -1,9 +1,9 @@
-from django.forms import ModelForm
+from django import forms
 from . import models
 from django.contrib.auth.models import User
 from bootstrap_toolkit.widgets import BootstrapDateInput, BootstrapTextInput, BootstrapUneditableInput
 
-class CreateEventForm(ModelForm):
+class CreateEventForm(forms.ModelForm):
     class Meta:
         model = models.Event
         fields = [
@@ -13,16 +13,19 @@ class CreateEventForm(ModelForm):
             'plus',
         ]
 
-class CreateQuestionForm(ModelForm):
+class CreateQuestionForm(forms.ModelForm):
     class Meta:
         model = models.Question
         fields = [
             'description',
         ]
 
-class CreateOptionForm(ModelForm):
+class CreateOptionForm(forms.ModelForm):
     class Meta:
         model = models.Question
         fields = [
             'description',
         ]
+
+class TextForm(forms.Form):
+    text = forms.CharField(label='text', max_length=100)

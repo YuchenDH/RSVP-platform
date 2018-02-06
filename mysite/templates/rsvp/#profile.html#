@@ -2,17 +2,13 @@
 
 {% block content %}
 
-
 {% if user.is_authenticated %}
-<p> Your current events are: </p>
 <ul>
-  {% if EventsList %}
-  {% for item in EventsList %}
+  {% if event %}
  <!-- {$ if item.date_and_time < %} -->
-  <li> <a href="/rsvp/event/{{ item.id }}"> {{ item.title }} </a>, on {{ item.date_and_time }}. </li>
-  {% endfor %}
-  {% else %}
-  <p> No event found! </P>
+ <!-- <li> <a href="/rsvp/event/{{ item.id }}"> {{ item.title }} </a>, on {{ item.date_and_time }}. </li> -->
+ {% else %}
+ <p> Event Not Found! </p>
   {% endif %}
 </ul>
 {% else %}

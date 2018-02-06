@@ -4,10 +4,10 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from . import models
 from . import forms
+from  django.core.exceptions import ObjectDoesNotExist
 @login_required
 def index(request):
     #return HttpResponse('profile')
@@ -17,7 +17,7 @@ def index(request):
 @login_required
 def event(request, id):
     #show event detail
-    Object = request.user.event_set.filter(pk=id).all()
+    Object = request.user.event_set.get(pk=id)
     if Object:
         QuestionList = Object.question_set.all()
         context = {
@@ -25,6 +25,59 @@ def event(request, id):
             'question':QuestionList,
         }
         return render(request, 'rsvp/event.html', context)
+    else:
+        return HttpResponse(404)
+
+@login_required
+def add_owner(request, id):
+    #permission validate
+    try:
+        event=models.Event.objects.get(pk=id)
+        if event:
+            if request.method == 'POST':
+                form = forms.TextForm(request.POST)
+                if form.is_valid:
+                    NewRole = models.User.objects.get(username=request.POST['text'])
+                    if (NewRole):
+                        event.owner.add(NewRole)
+                        return redirect('/rsvp/event/'+id)
+                return HttpResponse(404)
+            else:
+                return render(request, 'rsvp/add_user.html', form=forms.UsernameForm)
+        else:
+            return HttpResponse(404)
+    except ObjectDoesNotExist as e:
+        return redirect('/rsvp/event/'+id)
+
+@login_required
+def add_vendor(request, id, role):
+    try:
+        event=models.Event.objects.get(pk=id)
+        if event:
+            if request.method == 'POST':
+                form = forms.TextForm(request.POST)
+                if form.is_valid:
+                    NewRole = models.User.objects.get(username=request.POST['text'])
+                    if (NewRole):
+                        if role == 'vendor':
+                            NewVendor = models.Vendor()
+                            NewVendor.people = NewRole
+                            NewVendor.event_id = id
+                            NewVendor.save()
+                        if role == 'guest':
+                            NewGuest = models.Guest()
+                            NewGuest.people = NewRole
+                            NewGuest.event_id = id
+                            NewGuest.save()
+                        return redirect('/rsvp/event/'+id)
+                return HttpResponse(404)
+            else:
+                return render(request, 'rsvp/add_user.html', form=forms.UsernameForm)
+        else:
+            return HttpResponse(404)
+    except ObjectDoesNotExist as e:
+        return redirect('/rsvp/event/'+id)
+
 
 @login_required
 def create_event(request):
@@ -33,7 +86,7 @@ def create_event(request):
         if form.is_valid():
             NewEvent = form.save()
             NewEvent.owner.add(request.user)
-            return redirect('index')
+            #return redirect('index')
             return redirect('event', id=NewEvent.pk)
     else:
         form = forms.CreateEventForm()

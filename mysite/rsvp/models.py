@@ -13,7 +13,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
     bio = models.TextField(max_length=500, blank=True)
     nickname = models.CharField(max_length=20, blank=True)
-
+    
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -53,16 +53,16 @@ class Vendor(models.Model):
     """
     Intermediate model for the vendor group
     """
-    people = models.ManyToManyField(User, blank=True, null=True)
-    event = models.OneToOneField(Event, on_delete=models.CASCADE)
+    people = models.OneToOneField(User, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 class Guest(models.Model):
     """
     Intermediate model for the guest group
     """
-    people = models.ManyToManyField(User, blank=True, null=True)
-    event = models.OneToOneField(Event, on_delete=models.CASCADE)
-    response = models.BooleanField(default=0)
+    people = models.OneToOneField(User, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    response = models.IntegerField(default='0')
 
 class Question(models.Model):
     """
