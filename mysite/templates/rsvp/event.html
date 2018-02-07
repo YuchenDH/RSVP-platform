@@ -6,10 +6,17 @@
 <ul>
   {% if event %}
   <!-- {$ if item.date_and_time < %} -->
-  <li>Event Title: {{ event.title }}</li>
-  <li>Summary: {{ event.summary }}</li>
-  <li>Date and Time: {{ event.date_and_time }}</li>
-  <li> Owners:
+  <form action="/rsvp/event/{{ event.pk }}/update" method="post">
+    {% csrf_token %}
+    <li>Event Title: <input type="text" name="title" value={{ event.title }}></li>
+    <li>Summary:<br>
+      <textarea rows="4" cols="50" name="summary">{{ event.summary }}</textarea></li>
+    <li>Date and Time: <input type="datetime-local" name="date_and_time", value={{ event.date_and_time|date:"Y-m-d\TH:i:s" }}></li>
+    <button type="submit" formmethod="post">Save Changes</button>
+  </form>
+
+  <p> Ownership & Guests </p>
+  <li>Owners:
     <ul>
       {% if event.owner %}
       {% for item in event.owner.all %}
@@ -17,7 +24,7 @@
       {% endfor %}
       {% endif %}
       <button onclick="myFunction('addOwner')">Add Owner</button>
-
+      
       <div id="addOwner" style="display:none">
 	<form action="/rsvp/event/{{ event.pk }}/add_owner" method="post">
 	  {% csrf_token %}
@@ -76,11 +83,50 @@
   <p> Error: No event found!</p>
   {% endif %}
 </ul>
+
+<p>Questions</p>
+<ul>
+  {% if event.question_set %}
+  {% for item in event.question_set.all %}
+  <li> {{ item.description }} <br>
+    finalized = {{ item.final }}
+    <ul>
+      {% if item.option_set %}
+      {% for options in item.option_set.all %}
+      <li> {{ options.description }} : {{ options.count }} </li>
+      {% endfor %}
+      {% endif %}
+      <button onclick="myFunction('addOption')">Edit/Finalize</button>
+      <div id="addOption" style="display:none">
+	<form action="/rsvp/event/{{ event.pk }}/{{ item.pk }}/add_option" method="post">
+	  {% csrf_token %}
+	  New Option: <input type="text" name="text" required >
+	  <button type="submit" formmethod="post">Submit</button>
+	</form>
+	<form action="{{ event.pk }}/{{ item.pk }}/finalize" method="post">{% csrf_token %}
+	  <button type="submit" formmethod="post">Finalize</button>
+	</form>
+      </div>
+    </ul>
+  </li>
+  {% endfor %}
+  {% endif %}
+  <button onclick="myFunction('addQuestion')">Add Question</button>
+  <div id="addQuestion" style="display:none">
+    <form action="/rsvp/event/{{ event.pk }}/add_question" method=\
+	  "post">
+      {% csrf_token %}
+      New Question: <input type="text" name="text" required>
+      <button type="submit" formmethod="post">Submit</button>
+    </form>
+  </div>
+</ul>
+
+
 {% else %}
 <p> Please <a href="{% url 'login' %}?next={{ next }}"> login </a>  </p>
 {% endif %}
 
-<p> <a href="{% url 'create_question' %}?id={{ event.pk }}"> New Question </a> </p>
 <script>
   function myFunction(blk) {
   var x = document.getElementById(blk);

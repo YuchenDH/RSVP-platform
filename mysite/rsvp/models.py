@@ -29,7 +29,7 @@ class Event(models.Model):
     """
     title = models.CharField(max_length=200, help_text="Enter the title of the event")
     owner = models.ManyToManyField(User)
-    date_and_time = models.DateTimeField(help_text="Enter the date and time of the event")
+    date_and_time = models.DateTimeField(help_text="Enter the date and time of the event as yyyy-mm-dd 23:59")
     summary = models.TextField(help_text="(Optional) Enter the details of the event.", null=True, blank=True)
     plus = models.IntegerField(default=0, help_text="Can guests bring additonal guests?")
     
@@ -53,16 +53,21 @@ class Vendor(models.Model):
     """
     Intermediate model for the vendor group
     """
-    people = models.OneToOneField(User, on_delete=models.CASCADE)
+    people = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 class Guest(models.Model):
     """
     Intermediate model for the guest group
     """
-    people = models.OneToOneField(User, on_delete=models.CASCADE)
+    people = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     response = models.IntegerField(default='0')
+    def __str__(self):
+        """
+        String for representing the Model object
+        """
+        return self.event.title
 
 class Question(models.Model):
     """
@@ -94,6 +99,7 @@ class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     description = models.TextField(help_text="Enter the option")
     count = models.IntegerField(default=0)
+    people = models.ManyToManyField(User, null=True, blank=True)
 
     def __str__(self):
         """

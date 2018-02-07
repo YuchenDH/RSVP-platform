@@ -8,11 +8,19 @@ from django.contrib.auth.forms import UserCreationForm
 from . import models
 from . import forms
 from  django.core.exceptions import ObjectDoesNotExist
+
 @login_required
 def index(request):
     #return HttpResponse('profile')
     EventsList = request.user.event_set.all()
-    return render(request, 'rsvp/profile.html', {'EventsList':EventsList})
+    VendorList = request.user.vendor_set.all()
+    GuestList = request.user.guest_set.all()
+    context = {
+        'EventsList':EventsList,
+        'VendorList':VendorList,
+        'GuestList':GuestList,
+        }
+    return render(request, 'rsvp/profile.html', context)
 
 @login_required
 def event(request, id):
@@ -28,6 +36,20 @@ def event(request, id):
     else:
         return HttpResponse(404)
 
+@login_required
+def event_update(request, id):
+    if request.method=='POST':
+        Object = request.user.event_set.get(pk=id)
+        if Object :
+            form = forms.CreateEventForm(request.POST)
+            if form.is_valid:
+                Object.title = request.POST['title']
+                Object.summary = request.POST['summary']
+                Object.date_and_time = request.POST['date_and_time']
+                Object.save()
+            return redirect('/rsvp/event/'+id)
+    return HttpResponse('404')
+    
 @login_required
 def add_owner(request, id):
     #permission validate
@@ -78,7 +100,64 @@ def add_vendor(request, id, role):
     except ObjectDoesNotExist as e:
         return redirect('/rsvp/event/'+id)
 
+@login_required
+def add_question(request, id):
+    try:
+        event=models.Event.objects.get(pk=id)
+        if event:
+            if request.method == 'POST':
+                form = forms.TextForm(request.POST)
+                if form.is_valid:
+                    NewQuestion = models.Question()
+                    NewQuestion.description = request.POST['text']
+                    NewQuestion.final = 0
+                    NewQuestion.event = event
+                    NewQuestion.vendor = request.user
+                    NewQuestion.save()
+                    return redirect('/rsvp/event/'+id)
+                return HttpResponse(404)
+        else:
+            return HttpResponse(404)
+    except ObjectDoesNotExist as e:
+        return redirect('/rsvp/event/'+id)
 
+@login_required
+def add_option(request, id, qid):
+    try:
+        event=models.Event.objects.get(pk=id)
+        question = event.question_set.get(pk=qid)
+        if event and question :
+            if request.method == 'POST':
+                form = forms.TextForm(request.POST)
+                if form.is_valid:
+                    NewOption = models.Option()
+                    NewOption.description = request.POST['text']
+                    NewOption.count = 0
+                    NewOption.question = question
+                    NewOption.save()
+                    return redirect('/rsvp/event/'+id)
+                return HttpResponse(404)
+        else:
+            return HttpResponse(404)
+    except ObjectDoesNotExist as e:
+        return redirect('/rsvp/event/'+id)
+
+@login_required
+def question_finalize(request, id, qid):
+    try:
+        event = request.user.event_set.get(pk=id)
+        question = event.question_set.get(pk=qid)
+        if event and question :
+            if question.final == 0:
+                question.final = 1
+            else:
+                question.final = 0
+            question.save()
+            return redirect('/rsvp/event/'+id)
+        return HttpResponse(404)
+    except ObjectDoesNotExist as e:
+        return redirect('/rsvp/event/'+id)
+    
 @login_required
 def create_event(request):
     if request.method == 'POST':

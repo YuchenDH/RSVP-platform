@@ -11,9 +11,9 @@
 
 <form method="post" action="{% url 'create_event' %}">
   {% csrf_token %}
-  <table>
-    {{ form }}
-  </table>
+
+  {{ form.as_ul }}
+    
   <input type="submit" value="Submit" />
   <input type="reset">
 </form>

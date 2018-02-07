@@ -4,17 +4,58 @@
 
 
 {% if user.is_authenticated %}
-<p> Your current events are: </p>
+<p> Your current events as owner are: </p>
 <ul>
   {% if EventsList %}
   {% for item in EventsList %}
- <!-- {$ if item.date_and_time < %} -->
   <li> <a href="/rsvp/event/{{ item.id }}"> {{ item.title }} </a>, on {{ item.date_and_time }}. </li>
   {% endfor %}
   {% else %}
   <p> No event found! </P>
   {% endif %}
 </ul>
+
+<p> Your current events as vendor are: </p>
+<ul>
+  {% if VendorList %}
+  {% for item in VendorList %}
+  <li> <a href="/rsvp/event/{{ item.event_id }}"> {{ item.event.title }} </a>, on {{ item.event.date_and_time }}. </li>
+  {% endfor %}
+  {% else %}
+  <p> No event found! </P>
+  {% endif %}
+</ul>
+<p> Your have decided to go to these events as a guest: </p>
+<ul>
+  {% if GuestList %}
+  {% for item in GuestList %}
+  {% if item.response == 1 %}
+  <li> <a href="/rsvp/event/{{ item.event_id }}"> {{ item.event.title }} </a>, on {{ item.event.date_and_time }}. </li>
+  {% endif %}
+  {% endfor %}
+  {% else %}
+  <p> No event found! </P>
+  {% endif %}
+</ul>
+<p> Your are invited to these events: </p>
+<ul>
+  {% if GuestList %}
+  {% for item in GuestList %}
+  {% if item.response == 0 %}
+  <li> <a href="/rsvp/event/{{ item.event_id }}"> {{ item.event.title }} </a>, on {{ item.event.date_and_time }}. </li>
+  <form action="/rsvp/event/{{ event.pk }}response" method="post">
+    {% csrf_token %}
+    <button type="submit" name="response" value=1> I'll show up!</button>
+    <button type="submit" name="response" value=-1> No I won't go</button>      
+  </form>
+  {% endif %}
+  {% endfor %}
+  {% else %}
+  <p> No event found! </P>
+  {% endif %}
+</ul>
+
+
 {% else %}
 <p> Please <a href="{% url 'login' %}?next={{ next }}"> login </a>  </p>
 {% endif %}
