@@ -29,3 +29,6 @@ class CreateOptionForm(forms.ModelForm):
 
 class TextForm(forms.Form):
     text = forms.CharField(label='text', max_length=100)
+
+class ResponseForm(forms.Form):
+    response = forms.CharField(label='response', max_length=1)

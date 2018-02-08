@@ -32,7 +32,11 @@ def event(request, id):
             'event':Object,
             'question':QuestionList,
         }
-        return render(request, 'rsvp/event.html', context)
+        if request.method=='GET':
+            return render(request, 'rsvp/event.html', context)
+        elif request.method=='POST':
+            #permission
+            return render(request, 'rsvp/edit_event.html', context)
     else:
         return HttpResponse(404)
 
@@ -47,7 +51,12 @@ def event_update(request, id):
                 Object.summary = request.POST['summary']
                 Object.date_and_time = request.POST['date_and_time']
                 Object.save()
-            return redirect('/rsvp/event/'+id)
+            QuestionList = Object.question_set.all()
+            context = {
+                'event':Object,
+                'question':QuestionList,
+            }
+            return render(request, '/rsvp/edit_event.html', context)
     return HttpResponse('404')
     
 @login_required
@@ -62,7 +71,7 @@ def add_owner(request, id):
                     NewRole = models.User.objects.get(username=request.POST['text'])
                     if (NewRole):
                         event.owner.add(NewRole)
-                        return redirect('/rsvp/event/'+id)
+                        return redirect('/rsvp/event/'+id, method='POST')
                 return HttpResponse(404)
             else:
                 return render(request, 'rsvp/add_user.html', form=forms.UsernameForm)
@@ -114,7 +123,12 @@ def add_question(request, id):
                     NewQuestion.event = event
                     NewQuestion.vendor = request.user
                     NewQuestion.save()
-                    return redirect('/rsvp/event/'+id)
+                    QuestionList = event.question_set.all()
+                    context = {
+                        'event':event,
+                        'question':QuestionList,
+                    }
+                    return render(request, 'rsvp/edit_event.html', context)
                 return HttpResponse(404)
         else:
             return HttpResponse(404)
@@ -135,7 +149,12 @@ def add_option(request, id, qid):
                     NewOption.count = 0
                     NewOption.question = question
                     NewOption.save()
-                    return redirect('/rsvp/event/'+id)
+                    QuestionList = event.question_set.all()
+                    context = {
+                        'event':event,
+                        'question':QuestionList,
+                    }
+                    return render(request, 'rsvp/edit_event.html', context)
                 return HttpResponse(404)
         else:
             return HttpResponse(404)
@@ -184,7 +203,7 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
-
+"""
 @login_required
 def create_question(request, event_pk):
     if request.method == 'POST':
@@ -209,11 +228,44 @@ def create_option(request, question_pk):
     else:
         form = forms.OptionCreationForm()
     return render(request, 'rsvp/create_option.html', id=form.question.event.pk)
-
+"""
 @login_required
-def guest_response(request, event_pk):
-    return HttpResponse('guest_response')
+def guest_response(request, id):
+    if request.method == 'POST':
+        form = forms.ResponseForm(request.POST)
+        if form.is_valid():
+            event = models.Event.objects.get(pk=id)
+            guest = event.guest_set.get(people=request.user)
+            if request.POST['response'] == '0':
+                guest.response = -1
+                guest.save()
+                return redirect('index')
+            else:
+                guest.response = 1
+                guest.save()
+                QuestionList = event.question_set.all()
+                context = {
+                    'Plus':'1',
+                    }
+                return redirect('event', id=id)
+        else:
+            return HttpResponse(400)
 #takes event_pk look for the event
 #validate whether the guest is in the guest group
 #if validated, return the response page, passing the event_pk and user_pk as context
 #else, show the permission denied page
+
+@login_required
+def guest_question(request, id):
+    return
+"""
+    if request.method == 'POST':
+        try:
+            event = models.Event.objects.get(pk=id)
+            if event:
+                guest = event.guest_set.get(people=request.user)
+                if guest.response == 1:
+                    return render(request, 'rsvp/question.html')
+                else:
+                    raise ObjectDoesNotExist()
+"""

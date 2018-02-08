@@ -1,0 +1,140 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+<ul>
+  {% if event %}
+  <!-- {$ if item.date_and_time < %} -->
+  <form action="/rsvp/event/{{ event.pk }}/update" method="post">
+    {% csrf_token %}
+    <li>Event Title: <input type="text" name="title" value={{ event.title }}></li>
+    <li>Summary:<br>
+      <textarea rows="4" cols="50" name="summary">{{ event.summary }}</textarea></li>
+    <li>Date and Time: <input type="datetime-local" name="date_and_time", value={{ event.date_and_time|date:"Y-m-d\TH:i:s" }}></li>
+    <button type="submit" formmethod="post">Save Changes</button>
+  </form>
+
+  <p> Ownership & Guests </p>
+  <li>Owners:
+    <ul>
+      {% if event.owner %}
+      {% for item in event.owner.all %}
+      <li> {{ item.username }} </li>
+      {% endfor %}
+      {% endif %}
+      <button onclick="myFunction('addOwner')">Add Owner</button>
+      
+      <div id="addOwner" style="display:none">
+	<form action="/rsvp/event/{{ event.pk }}/add_owner" method="post">
+	  {% csrf_token %}
+	  Username: <input type="text" name="text" required >
+	  <button type="submit" formmethod="post">Submit</button>
+	</form>
+      </div>
+    </ul>
+  </li>
+  
+  <li> Vendors:
+    <ul>
+      {% if event.vendor_set %}
+      {% for item in event.vendor_set.all %}
+      <li> {{ item.people.username }} </li>
+      {% endfor %}
+      {% endif %}
+      <button onclick="myFunction('addVendor')">Add Vendor</button>
+      <div id="addVendor" style="display:none">
+	<form action="/rsvp/event/{{ event.pk }}/add_vendor" method="post">
+	  {% csrf_token %}
+	  Username: <input type="text" name="text" required >
+	  <button type="submit" formmethod="post">Submit</button>
+	</form>
+      </div>
+    </ul>
+  </li>
+  <li> Guests:
+    <ul>
+      {% if event.guest_set %}
+      {% for item in event.guest_set.all %}
+      <li> {{ item.people.username }} has
+	{% if item.response == 0 %}
+	not decided
+	{% endif %}
+	{% if item.response == -1 %}
+	decided not to come
+	{% endif %}
+	{% if item.response == 1 %}
+	decided to come
+	{% endif %}
+	<a href="/rsvp/event/{{ event.pk }}/remove_guest?id={{ item.people.pk }}"> remove </a>
+      </li>
+      {% endfor %}
+      {% endif %}
+      <button onclick="myFunction('addGuest')">Add Guest</button>
+      <div id="addGuest" style="display:none">
+	<form action="/rsvp/event/{{ event.pk }}/add_guest" method="post">
+	  {% csrf_token %}
+	  Username: <input type="text" name="text" required >
+	  <button type="submit" formmethod="post">Submit</button>
+	</form>
+      </div>
+    </ul>
+  {% else %}
+  <p> Error: No event found!</p>
+  {% endif %}
+</ul>
+
+<p>Questions</p>
+<ul>
+  {% if event.question_set %}
+  {% for item in event.question_set.all %}
+  <li> {{ item.description }} <br>
+    finalized = {{ item.final }}
+    <ul>
+      {% if item.option_set %}
+      {% for options in item.option_set.all %}
+      <li> {{ options.description }} : {{ options.count }} </li>
+      {% endfor %}
+      {% endif %}
+      <button onclick="myFunction('addOption')">Edit/Finalize</button>
+      <div id="addOption" style="display:none">
+	<form action="/rsvp/event/{{ event.pk }}/{{ item.pk }}/add_option" method="post">
+	  {% csrf_token %}
+	  New Option: <input type="text" name="text" required >
+	  <button type="submit" formmethod="post">Submit</button>
+	</form>
+	<form action="{{ event.pk }}/{{ item.pk }}/finalize" method="post">{% csrf_token %}
+	  <button type="submit" formmethod="post">Finalize</button>
+	</form>
+      </div>
+    </ul>
+  </li>
+  {% endfor %}
+  {% endif %}
+  <button onclick="myFunction('addQuestion')">Add Question</button>
+  <div id="addQuestion" style="display:none">
+    <form action="/rsvp/event/{{ event.pk }}/add_question" method=\
+	  "post">
+      {% csrf_token %}
+      New Question: <input type="text" name="text" required>
+      <button type="submit" formmethod="post">Submit</button>
+    </form>
+  </div>
+</ul>
+
+
+{% else %}
+<p> Please <a href="{% url 'login' %}?next={{ next }}"> login </a>  </p>
+{% endif %}
+
+<script>
+  function myFunction(blk) {
+  var x = document.getElementById(blk);
+  if (x.style.display === "none") {
+  x.style.display = "block";
+  } else {
+  x.style.display = "none";
+  }
+  }
+</script>
+{% endblock %}

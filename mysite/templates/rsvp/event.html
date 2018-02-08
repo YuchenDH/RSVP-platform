@@ -3,17 +3,16 @@
 {% block content %}
 
 {% if user.is_authenticated %}
+<h3> Event Details </h3>  <form action="/rsvp/event/{{ event.id }}" method="POST" >    {% csrf_token %}    <button type="submit" formmethod="post"> Edit</button>
+  </form>
+
 <ul>
   {% if event %}
   <!-- {$ if item.date_and_time < %} -->
-  <form action="/rsvp/event/{{ event.pk }}/update" method="post">
-    {% csrf_token %}
-    <li>Event Title: <input type="text" name="title" value={{ event.title }}></li>
-    <li>Summary:<br>
+  <li>Event Title: {{ event.title }}</li>
+  <li>Summary:<br>
       <textarea rows="4" cols="50" name="summary">{{ event.summary }}</textarea></li>
-    <li>Date and Time: <input type="datetime-local" name="date_and_time", value={{ event.date_and_time|date:"Y-m-d\TH:i:s" }}></li>
-    <button type="submit" formmethod="post">Save Changes</button>
-  </form>
+    <li>Date and Time: {{ event.date_and_time|date:"Y-m-d H:i:s" }}</li><br />
 
   <p> Ownership & Guests </p>
   <li>Owners:
@@ -23,18 +22,9 @@
       <li> {{ item.username }} </li>
       {% endfor %}
       {% endif %}
-      <button onclick="myFunction('addOwner')">Add Owner</button>
-      
-      <div id="addOwner" style="display:none">
-	<form action="/rsvp/event/{{ event.pk }}/add_owner" method="post">
-	  {% csrf_token %}
-	  Username: <input type="text" name="text" required >
-	  <button type="submit" formmethod="post">Submit</button>
-	</form>
-      </div>
     </ul>
   </li>
-  
+  {% if 1 %}
   <li> Vendors:
     <ul>
       {% if event.vendor_set %}
@@ -42,16 +32,9 @@
       <li> {{ item.people.username }} </li>
       {% endfor %}
       {% endif %}
-      <button onclick="myFunction('addVendor')">Add Vendor</button>
-      <div id="addVendor" style="display:none">
-	<form action="/rsvp/event/{{ event.pk }}/add_vendor" method="post">
-	  {% csrf_token %}
-	  Username: <input type="text" name="text" required >
-	  <button type="submit" formmethod="post">Submit</button>
-	</form>
-      </div>
     </ul>
   </li>
+  {% endif %}
   <li> Guests:
     <ul>
       {% if event.guest_set %}
@@ -60,32 +43,20 @@
 	{% if item.response == 0 %}
 	not decided
 	{% endif %}
-	{% if item.response == -1 %}
-	decided not to come
-	{% endif %}
 	{% if item.response == 1 %}
 	decided to come
 	{% endif %}
-	<a href="/rsvp/event/{{ event.pk }}/remove_guest?id={{ item.people.pk }}"> remove </a>
       </li>
       {% endfor %}
       {% endif %}
-      <button onclick="myFunction('addGuest')">Add Guest</button>
-      <div id="addGuest" style="display:none">
-	<form action="/rsvp/event/{{ event.pk }}/add_guest" method="post">
-	  {% csrf_token %}
-	  Username: <input type="text" name="text" required >
-	  <button type="submit" formmethod="post">Submit</button>
-	</form>
-      </div>
     </ul>
   {% else %}
   <p> Error: No event found!</p>
   {% endif %}
-</ul>
 
-<p>Questions</p>
-<ul>
+<!-- if has permission -->
+<li>Questions</li>
+
   {% if event.question_set %}
   {% for item in event.question_set.all %}
   <li> {{ item.description }} <br>
@@ -96,30 +67,14 @@
       <li> {{ options.description }} : {{ options.count }} </li>
       {% endfor %}
       {% endif %}
-      <button onclick="myFunction('addOption')">Edit/Finalize</button>
-      <div id="addOption" style="display:none">
-	<form action="/rsvp/event/{{ event.pk }}/{{ item.pk }}/add_option" method="post">
-	  {% csrf_token %}
-	  New Option: <input type="text" name="text" required >
-	  <button type="submit" formmethod="post">Submit</button>
-	</form>
-	<form action="{{ event.pk }}/{{ item.pk }}/finalize" method="post">{% csrf_token %}
-	  <button type="submit" formmethod="post">Finalize</button>
-	</form>
-      </div>
+      <form action="/rsvp/event/{{ event.pk }}/{{ item.pk }}/finalize" method="POST">
+	{% csrf_token %}
+	<button type="submit" formmethod="post">Finalize</button>
+      </form>
     </ul>
   </li>
   {% endfor %}
   {% endif %}
-  <button onclick="myFunction('addQuestion')">Add Question</button>
-  <div id="addQuestion" style="display:none">
-    <form action="/rsvp/event/{{ event.pk }}/add_question" method=\
-	  "post">
-      {% csrf_token %}
-      New Question: <input type="text" name="text" required>
-      <button type="submit" formmethod="post">Submit</button>
-    </form>
-  </div>
 </ul>
 
 
