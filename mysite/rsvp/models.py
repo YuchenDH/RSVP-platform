@@ -97,12 +97,13 @@ class Option(models.Model):
     Model representing a option for a survey question
     """
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    description = models.TextField(help_text="Enter the option")
+    description = models.TextField(help_text="Enter the option", blank=True)
     count = models.IntegerField(default=0)
     people = models.ManyToManyField(User, null=True, blank=True)
-
     def __str__(self):
         """
         String for representing the Model object
         """
         return self.description
+
+

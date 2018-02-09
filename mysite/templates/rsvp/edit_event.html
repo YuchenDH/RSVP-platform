@@ -100,7 +100,7 @@
       <div id="addOption" style="display:none">
 	<form action="/rsvp/event/{{ event.pk }}/{{ item.pk }}/add_option" method="post">
 	  {% csrf_token %}
-	  New Option: <input type="text" name="text" required >
+	  New Option: <input type="text" name="text" >
 	  <button type="submit" formmethod="post">Submit</button>
 	</form>
 	<form action="{{ event.pk }}/{{ item.pk }}/finalize" method="post">{% csrf_token %}

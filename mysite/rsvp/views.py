@@ -145,7 +145,10 @@ def add_option(request, id, qid):
                 form = forms.TextForm(request.POST)
                 if form.is_valid:
                     NewOption = models.Option()
-                    NewOption.description = request.POST['text']
+                    if (request.POST['text'] ==""):
+                        NewOption.description = "Enter your answer"
+                    else:
+                        NewOption.description = request.POST['text']
                     NewOption.count = 0
                     NewOption.question = question
                     NewOption.save()
@@ -228,7 +231,7 @@ def create_option(request, question_pk):
     else:
         form = forms.OptionCreationForm()
     return render(request, 'rsvp/create_option.html', id=form.question.event.pk)
-"""
+
 @login_required
 def guest_response(request, id):
     if request.method == 'POST':
@@ -254,7 +257,7 @@ def guest_response(request, id):
 #validate whether the guest is in the guest group
 #if validated, return the response page, passing the event_pk and user_pk as context
 #else, show the permission denied page
-
+"""
 @login_required
 def guest_question(request, id):
     return
@@ -269,3 +272,28 @@ def guest_question(request, id):
                 else:
                     raise ObjectDoesNotExist()
 """
+@login_required
+def guest_response(request, id):
+    event = models.Event.objects.get(pk=id)
+    
+    if request.method == 'POST':
+        guest = event.guest_set.get(people=request.user)
+        if request.POST['response'] == '0':
+            guest.response = -1
+            guest.save()
+            return redirect('index')
+        else:
+            guest.response = 1
+            guest.save()
+            QuestionList = event.question_set.all()
+            context = {
+                'Plus':'1',
+            }
+        return redirect('event', id=id)
+    else:
+        form = forms.ResponseForm()
+        context = {'event':event,
+                   'form':form,
+               }
+    return render(request, 'rsvp/response.html', context)
+
