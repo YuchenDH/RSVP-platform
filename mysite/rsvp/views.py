@@ -245,72 +245,7 @@ def signup(request):
     else:
         form = forms.UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
-"""
-@login_required
-def create_question(request, event_pk):
-    if request.method == 'POST':
-        form = QuestionCreationForm(request.POST)
-        if form.is_valid():
-            NewQuestion = form.save()
-            NewQuestion.event = Event_set.filter(pk=event_pk).all
-            NewQuestion.final = False
-            return redirect('event', id=event_pk)
-    else:
-        form = forms.QuestionCreationForm()
-    return render(request, 'rsvp/create_question.html', id=event_pk)
 
-@login_required
-def create_option(request, question_pk):
-    if request.method == 'POST':
-        form = OptionCreationForm(request.POST)
-        if form.is_valid():
-            NewOption=form.save()
-            NewOption.question = Question_set.filter(pk=question_pk).all
-            return redirect('event', id=Question.objects.get(pk=question_pk).event.pk)
-    else:
-        form = forms.OptionCreationForm()
-    return render(request, 'rsvp/create_option.html', id=form.question.event.pk)
-
-@login_required
-def guest_response(request, id):
-    if request.method == 'POST':
-        form = forms.ResponseForm(request.POST)
-        if form.is_valid():
-            event = models.Event.objects.get(pk=id)
-            guest = event.guest_set.get(people=request.user)
-            if request.POST['response'] == '0':
-                guest.response = -1
-                guest.save()
-                return redirect('index')
-            else:
-                guest.response = 1
-                guest.save()
-                QuestionList = event.question_set.all()
-                context = {
-                    'Plus':'1',
-                    }
-                return redirect('event', id=id)
-        else:
-            return HttpResponse(400)
-#takes event_pk look for the event
-#validate whether the guest is in the guest group
-#if validated, return the response page, passing the event_pk and user_pk as context
-#else, show the permission denied page
-"""
-@login_required
-def guest_question(request, id):
-    return
-"""
-    if request.method == 'POST':
-        try:
-            event = models.Event.objects.get(pk=id)
-            if event:
-                guest = event.guest_set.get(people=request.user)
-                if guest.response == 1:
-                    return render(request, 'rsvp/question.html')
-                else:
-                    raise ObjectDoesNotExist()
-"""
 @login_required
 def guest_response(request, id):
     event = models.Event.objects.get(pk=id)
@@ -332,17 +267,19 @@ def guest_response(request, id):
                             option = models.Option()
                             option.description=request.POST[str(question.pk)+'user']
                             option.question=question
-
                             option.count=1
                             option.original=False
                             option.save()
                             option.people.add(request.user)
                             option.save()
-                        else:
-                            option = models.Option.objects.get(pk=int(request.POST[str(question.pk)]))
-                            option.people.add(request.user)
-                            option.count+=1
-                            option.save()
+                    else:
+                        option = models.Option.objects.get(pk=int(request.POST[str(question.pk)]))
+                        print(option.description)
+                        print(request.user)
+                        option.people.add(request.user)
+                        option.count+=1
+                        option.save()
+                        #print(option.people.all())
             context = {
                 'Plus':'1',
             }

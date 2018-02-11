@@ -14,7 +14,6 @@ urlpatterns = [
     path('event/<id>/<qid>/add_option', views.add_option, name='add_option'),
     path('event/<id>/<qid>/finalize', views.question_finalize, name='finalize'),
     path('event/<id>/response', views.guest_response, name='response'),
-    path('event/<id>/question', views.guest_question, name='question'),
     path('event/<id>/remove_question/<qid>', views.remove_question, name='remove_question'),
     path('event/<id>/remove_option/<oid>', views.remove_option, name='remove_option'),
     path('event/<id>/edit_question/<qid>', views.edit_question, name='edit_question'),
