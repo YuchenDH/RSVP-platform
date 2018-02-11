@@ -56,11 +56,12 @@
 
 <!-- if has permission -->
 <li>Questions</li>
-
   {% if event.question_set %}
   {% for item in event.question_set.all %}
   <li> {{ item.description }} <br>
-    finalized = {{ item.final }}
+    {% if item.final %}
+    <p> This question is finalized </p>
+    {% endif %}
     <ul>
       {% if item.option_set %}
       {% for options in item.option_set.all %}

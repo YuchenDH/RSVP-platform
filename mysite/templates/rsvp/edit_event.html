@@ -104,7 +104,7 @@
       
       {% if question.option_set %}
       {% for options in question.option_set.all %}
-      <li> {{ options.description }} : {{ options.count }} <a href="/rsvp/event/{{ event.pk }}/remove_option/{{ options.pk }}"> remove </a>
+      <li> {{ options.description }} <a href="/rsvp/event/{{ event.pk }}/remove_option/{{ options.pk }}"> remove </a>
       <button onclick="myFunction('editOption{{ options.pk }}')">Edit Option</button>
       <div id="editOption{{ options.pk }}" style="display:none">
       <form action="/rsvp/event/{{ event.pk }}/edit_option/{{ options.pk }}" method="post">

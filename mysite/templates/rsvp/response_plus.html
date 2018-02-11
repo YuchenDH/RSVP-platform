@@ -7,42 +7,27 @@
 <p>  {{ event.summary }} </p>
   <form action="/rsvp/event/{{ event.pk }}/response" method="post">
     {% csrf_token %}
-    <div id="Question">
+    <div id="Question" style="display:none">
       {% if event.question_set %}
       {% for question in event.question_set.all %}
+      {% if question.final %}
+      {% else %}
       <li> {{ question.description }} <br>
         <table>
-
           {% if question.option_set %}
           {% for option in question.option_set.all %}
 	  {% if option.original %}
-          <input type="radio" name="{{ question.pk }}" value={{ option.pk }} > {{ option.description }} <br />
+          <input type="radio" name="{{ question.pk }}" value="{{ option.pk }}" > {{ option.description }} <br />
 	  {% endif %}
 	  {% endfor %}
 	  {% if question.userspecify %}
-	  <input type="radio" name="{{ question.pk }}" value=-1> Enter your response: <input type="text" name="{{ question.pk }}user" >
+	  <input type="radio" name="{{ question.pk }}" value="-1"> Enter your response: <input type="text" name="{{ question.pk }}user" >
 	  {% endif %}
           {% endif %}
         </table>
       </li>
-      {% endfor %}
-      {% if plus %}
-      {% for question in event.question_set.all %}
-      <li> {{ question.description }} <br>
-        <table>
-
-          {% if question.option_set %}
-          {% for option in question.option_set.all %}
-          <input type="radio" name="{{ question.pk }}_plus" value="{{ option.pk }}" > {{ option.description }} <br />
-	  {% endfor %}
-	  {% if question.userspecify %}
-	  <input type="radio" name="{{ question.pk }}_plus" value="-1"> Enter your response: <input type="text" name="{{ question.pk }}_plus" >
-	  {% endif %}
-          {% endif %}
-        </table>
-      </li>
-      {% endfor %}
       {% endif %}
+      {% endfor %}
       {% endif %}
       <button type="submit" name="response" value="one"> Confirm!</button>
     </div>

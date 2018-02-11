@@ -188,6 +188,7 @@ def add_option(request, id, qid):
                         NewOption.description = request.POST['text']
                     NewOption.count = 0
                     NewOption.question = question
+                    NewOption.original = True
                     NewOption.save()
                     QuestionList = event.question_set.all()
                     context = {
@@ -452,12 +453,12 @@ def view_response(request, id):
 
 @login_required
 def edit_response(request, id):
+    event = models.Event.objects.get(pk=id)
+    is_guest(request.user, event)
     try:
-        event = models.Event.objects.get(pk=id)
-        if_guest(request.user, event)
         for question in event.question_set.all():
-            for option in question.option_set.filter(people=request.user):
-                if option.original:
+            for option in question.option_set.all():
+                if option.people.filter(pk=request.user.pk).exists() and option.original:
                     option.people.remove(request.user)
                     option.save()
                 else:
@@ -467,5 +468,5 @@ def edit_response(request, id):
                    'form':form,
             }
         return render(request, 'rsvp/response.html', context)
-    except e:
-        return HttpResponse(e, 403)
+    except:
+        return HttpResponse(403)

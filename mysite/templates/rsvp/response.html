@@ -12,6 +12,8 @@
     <div id="Question" style="display:none">
       {% if event.question_set %}
       {% for question in event.question_set.all %}
+      {% if question.final %}
+      {% else %}
       <li> {{ question.description }} <br>
         <table>
           {% if question.option_set %}
@@ -26,6 +28,7 @@
           {% endif %}
         </table>
       </li>
+      {% endif %}
       {% endfor %}
       {% endif %}
       <button type="submit" name="response" value="one"> Confirm!</button>
