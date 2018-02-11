@@ -31,7 +31,7 @@ class Event(models.Model):
     owner = models.ManyToManyField(User)
     date_and_time = models.DateTimeField(help_text="Enter the date and time of the event as yyyy-mm-dd 23:59")
     summary = models.TextField(help_text="(Optional) Enter the details of the event.", null=True, blank=True)
-    plus = models.IntegerField(default=0, help_text="Can guests bring additonal guests?")
+    plus = models.BooleanField(default=False, help_text="Can guests bring an additonal guest?")
     
     class Meta:
         ordering = ["date_and_time", "title"]
@@ -75,6 +75,7 @@ class Question(models.Model):
     """
     vendor = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    userspecify = models.BooleanField(default=0)
     description = models.TextField(help_text="Enter the question")
     final = models.IntegerField(default=0, help_text="Is the result finalized?")
     def is_final(self):
@@ -97,7 +98,8 @@ class Option(models.Model):
     Model representing a option for a survey question
     """
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    description = models.TextField(help_text="Enter the option", blank=True)
+    original = models.BooleanField(default=True, help_text="Is the option added by owner?")
+    description = models.TextField(help_text="Enter the option")
     count = models.IntegerField(default=0)
     people = models.ManyToManyField(User, null=True, blank=True)
     def __str__(self):
@@ -105,5 +107,8 @@ class Option(models.Model):
         String for representing the Model object
         """
         return self.description
+
+
+
 
 

@@ -1,0 +1,37 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+
+<h3> Response:</h3>
+<ul>
+  {% if is_guest %}
+  {% for option in option_list %}
+  <li> For question "{{ option.question.description }}", {{ option.description }} was selected </li>
+  {% endfor %}
+  {% else %}
+  {% for question in question_list.all %}
+  <li> {{ question.description }} </li>
+  <form action="/rsvp/event/{{ event.pk }}/{{ item.pk }}/finalize" method="POST">
+    {% csrf_token %}
+    <button type="submit" formmethod="post">Finalize</button>
+  </form>
+  
+  <ul>
+    {% for option in question.option_set.all %}
+    <li> {{ option.description }} :
+      {% for guest in option.people.all %}
+      {{ guest.username }} 
+      {% endfor %}</li>
+    {% endfor %}
+  </ul>
+  {% endfor %}
+  {% endif %}
+</ul>
+
+{% if is_guest %}
+<p><a href="edit_response" label="Edit Response"> Edit Response </a></p>
+{% endif %}
+{% endif %}
+{% endblock %}

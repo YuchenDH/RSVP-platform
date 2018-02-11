@@ -26,7 +26,11 @@ SECRET_KEY = ')4z-o7jif=)q%(e8j54%^k6k4r=p9x2vj=a49su)))ca9a_m0o'
 DEBUG = True
 
 ALLOWED_HOSTS = ['vcm-143.vm.duke.edu']
-
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'rsvpplatform@gmail.com'
+EMAIL_HOST_PASSWORD = 'ece590590'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -77,11 +81,10 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'rsvp',
-        'USER': 'yw263',
-        'PASSWORD': 'wycwyc',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': 'hw1',
+        'USER': 'postgres',
+#        'HOST': '127.0.0.1',
+#        'PORT': '5432',
     }
 }
 

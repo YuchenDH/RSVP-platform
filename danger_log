@@ -1,0 +1,7 @@
+Since it is the first time we use Django to build a web server, there are some imperfect approaches to implement the functions which may lead to potential security issues or errors. We list all the thoughts about the potential risks and possible solution which has not been applied to our current program due to the time limitation.
+
+Dangers & possible solution:
+
+1.
+2.
+3

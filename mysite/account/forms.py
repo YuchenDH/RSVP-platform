@@ -24,6 +24,7 @@ class LoginForm(forms.Form):
             }
         ),
     )
+    
 
     def clean(self):
         if not self.is_valid():
@@ -55,6 +56,17 @@ class RegisterForm(forms.Form):
         ),
     )
 
+    email = forms.CharField(
+        required = True,
+        label = u"Email",
+        error_messages = {'required': u'Please input your email address'},
+        widget = forms.EmailInput(
+            attrs={
+                'placeholder':u"Email",
+            }
+        ),
+    )
+    
     def clean(self):
         if not self.is_valid():
             raise forms.ValidationError(u"Please input your usernameand password.")

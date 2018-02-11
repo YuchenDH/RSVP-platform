@@ -2,34 +2,40 @@
 
 {% block content %}
 
-<ul>
-<p> {{ item.event.title}}, on {{ item.event.date_and_time }}. </p>
-    
-  <form action="/rsvp/event/{{ item.event_id }}/response" method="post">
+<h2> {{ event.title}}, on {{ event.date_and_time }}. </h2>
+<p> Summary <p><br />
+<p>  {{ event.summary }} </p>
+  <form action="/rsvp/event/{{ event.pk }}/response" method="post">
     {% csrf_token %}
     <button type="button" onclick="myFunction ('Question')"> I'll show up!</button>
-    <button type="submit" name="response" value="0"> No I won't go</button>
+    <button type="submit" name="response" value="zero"> No I won't go</button>
     <div id="Question" style="display:none">
-      {% if item.event.question_set %}
-      {% for question in item.event.question_set.all %}
+      {% if event.question_set %}
+      {% for question in event.question_set.all %}
       <li> {{ question.description }} <br>
-        <ul>
+        <table>
           {% if question.option_set %}
-          {% for options in question.option_set.all %}	  
-          <input type="radio" name=question.id value=option.id id=option.id <li for=option.id> {{ options.description }} </li></br>
-		 {% endfor %}
-                 {% endif %}
-                 </ul>
+          {% for option in question.option_set.all %}
+	  {% if option.original %}
+          <input type="radio" name="{{ question.pk }}" value="{{ option.pk }}" > {{ option.description }} <br />
+	  {% endif %}
+	  {% endfor %}
+	  {% if question.userspecify %}
+	  <input type="radio" name="{{ question.pk }}" value="-1"> Enter your response: <input type="text" name="{{ question.pk }}user" >
+	  {% endif %}
+          {% endif %}
+        </table>
       </li>
       {% endfor %}
       {% endif %}
-
-      <button type="submit" name="response" value="1"> Confirm!</button>
+      <button type="submit" name="response" value="one"> Confirm!</button>
+      {% if event.plus %}
+      <button type="submit" name="response" value="two"> Confirm and Add Another Guest!</button>
+      {% endif %}
     </div>
   </form>
-</ul>
       
-<script>
+  <script>
   function myFunction(blk) {
   var x = document.getElementById(blk);
   if (x.style.display === "none") {

@@ -1,0 +1,60 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h2> {{ event.title}}, on {{ event.date_and_time }}. </h2>
+<h3> Please fill in questionaire for the plus person. </h3><br />
+<p>  {{ event.summary }} </p>
+  <form action="/rsvp/event/{{ event.pk }}/response" method="post">
+    {% csrf_token %}
+    <div id="Question">
+      {% if event.question_set %}
+      {% for question in event.question_set.all %}
+      <li> {{ question.description }} <br>
+        <table>
+
+          {% if question.option_set %}
+          {% for option in question.option_set.all %}
+          <input type="radio" name="{{ question.pk }}" value={{ option.pk }} > {{ option.description }} <br />
+	  {% endfor %}
+	  {% if question.userspecify %}
+	  <input type="radio" name="{{ question.pk }}" value=-1> Enter your response: <input type="text" name="{{ question.pk }}user" >
+	  {% endif %}
+          {% endif %}
+        </table>
+      </li>
+      {% endfor %}
+      {% if plus %}
+      {% for question in event.question_set.all %}
+      <li> {{ question.description }} <br>
+        <table>
+
+          {% if question.option_set %}
+          {% for option in question.option_set.all %}
+          <input type="radio" name="{{ question.pk }}_plus" value="{{ option.pk }}" > {{ option.description }} <br />
+	  {% endfor %}
+	  {% if question.userspecify %}
+	  <input type="radio" name="{{ question.pk }}_plus" value="-1"> Enter your response: <input type="text" name="{{ question.pk }}_plus" >
+	  {% endif %}
+          {% endif %}
+        </table>
+      </li>
+      {% endfor %}
+      {% endif %}
+      {% endif %}
+      <button type="submit" name="response" value="one"> Confirm!</button>
+    </div>
+  </form>
+      
+  <script>
+  function myFunction(blk) {
+  var x = document.getElementById(blk);
+  if (x.style.display === "none") {
+  x.style.display = "block";
+  } else {
+  x.style.display = "none";
+  }
+  }
+</script>
+{% endblock %}
+

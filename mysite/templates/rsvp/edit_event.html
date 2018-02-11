@@ -66,7 +66,7 @@
 	{% if item.response == 1 %}
 	decided to come
 	{% endif %}
-	<a href="/rsvp/event/{{ event.pk }}/remove_guest?id={{ item.people.pk }}"> remove </a>
+
       </li>
       {% endfor %}
       {% endif %}
@@ -87,39 +87,60 @@
 <p>Questions</p>
 <ul>
   {% if event.question_set %}
-  {% for item in event.question_set.all %}
-  <li> {{ item.description }} <br>
-    finalized = {{ item.final }}
+  {% for question in event.question_set.all %}
+  <li> {{ question.description }} <a href="/rsvp/event/{{ event.pk }}/remove_question/{{ question.pk }}"> remove </a>
+    <button onclick="myFunction('editQuestion')">Edit Question</button>
+    <div id="editQuestion" style="display:none">
+      <form action="/rsvp/event/{{ event.pk }}/edit_question/{{ question.pk }}" method="post">
+	{% csrf_token %}
+	Edit Description: <input type="text" name="text" required >
+	<button type="submit" formmethod="post">Submit</button>
+      </form>
+    </div>
     <ul>
-      {% if item.option_set %}
-      {% for options in item.option_set.all %}
-      <li> {{ options.description }} : {{ options.count }} </li>
+      {% if question.final %}
+      <li> This question is finalized! </li>
+      {% endif %}
+      
+      {% if question.option_set %}
+      {% for options in question.option_set.all %}
+      <li> {{ options.description }} : {{ options.count }} <a href="/rsvp/event/{{ event.pk }}/remove_option/{{ options.pk }}"> remove </a>
+      <button onclick="myFunction('editOption{{ options.pk }}')">Edit Option</button>
+      <div id="editOption{{ options.pk }}" style="display:none">
+      <form action="/rsvp/event/{{ event.pk }}/edit_option/{{ options.pk }}" method="post">
+	{% csrf_token %}
+	Edit Option: <input type="text" name="text" required >
+	<button type="submit" formmethod="post">Submit</button>
+      </form>
+    </div></li>
       {% endfor %}
       {% endif %}
-      <button onclick="myFunction('addOption')">Edit/Finalize</button>
-      <div id="addOption" style="display:none">
-	<form action="/rsvp/event/{{ event.pk }}/{{ item.pk }}/add_option" method="post">
+      <li><button onclick="myFunction('addOption{{ question.pk }}')">Create Option/Finalize Question</button>
+      <div id="addOption{{ question.pk }}" style="display:none">
+	<form action="/rsvp/event/{{ event.pk }}/{{ question.pk }}/add_option" method="post">
 	  {% csrf_token %}
-	  New Option: <input type="text" name="text" >
+	  New Option: <input type="text" name="text" required>
 	  <button type="submit" formmethod="post">Submit</button>
 	</form>
-	<form action="{{ event.pk }}/{{ item.pk }}/finalize" method="post">{% csrf_token %}
+	<form action="{{ event.pk }}/{{ question.pk }}/finalize" method="post">{% csrf_token %}
 	  <button type="submit" formmethod="post">Finalize</button>
 	</form>
-      </div>
+      </div></li>
     </ul>
   </li>
   {% endfor %}
   {% endif %}
-  <button onclick="myFunction('addQuestion')">Add Question</button>
+  <li><button onclick="myFunction('addQuestion')">Add Question</button>
   <div id="addQuestion" style="display:none">
-    <form action="/rsvp/event/{{ event.pk }}/add_question" method=\
-	  "post">
+    <form action="/rsvp/event/{{ event.pk }}/add_question" method="post">
       {% csrf_token %}
-      New Question: <input type="text" name="text" required>
+      New Question: <input type="text" name="text" required> <br />
+      Can User specify their own answer?: <input type="checkbox" name="userspecify" value=True> Custom Text Response
+      (If expect a free text question, check this box and leave options blank.)<br />
+      Vendor: <input type="text" name="vendor"> <br />
       <button type="submit" formmethod="post">Submit</button>
     </form>
-  </div>
+  </div></li>
 </ul>
 
 {% else %}
